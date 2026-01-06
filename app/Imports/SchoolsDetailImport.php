@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\School;
 use App\Models\SchoolSnapshot;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Throwable;
 
-class SchoolsDetailImport implements WithMultipleSheets
+class SchoolsDetailImport implements WithMultipleSheets, ShouldQueue
 {
     protected int $importId;
     protected int $rowsTotal = 0;

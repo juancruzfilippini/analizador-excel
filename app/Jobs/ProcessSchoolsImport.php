@@ -17,6 +17,14 @@ class ProcessSchoolsImport implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * Ensure the database queue connection is used even if the default is misconfigured
+     * and allow more than 60s for large imports while still running in the worker.
+     */
+    public string $connection = 'database';
+    public string $queue = 'imports';
+    public int $timeout = 300;
+
     public function __construct(private int $importId)
     {
     }
@@ -30,12 +38,14 @@ class ProcessSchoolsImport implements ShouldQueue
             return;
         }
 
-        $importer = new SchoolsDetailImport($import->id);
-
-        $import->update(['status' => 'processing']);
-
         try {
-            Excel::import($importer, $import->stored_path);
+            $importer = new SchoolsDetailImport($import->id);
+
+            $import->update(['status' => 'processing']);
+
+            $filePath = storage_path('app/' . ltrim($import->stored_path, '/'));
+
+            Excel::import($importer, $filePath);
             $summary = $importer->getSummary();
 
             $import->update([

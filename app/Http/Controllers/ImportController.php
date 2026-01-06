@@ -33,7 +33,7 @@ class ImportController extends Controller
             'status' => 'queued',
         ]);
 
-        ProcessSchoolsImport::dispatch($import->id);
+        ProcessSchoolsImport::dispatch($import->id)->onConnection('database')->onQueue('imports');
 
         return redirect()->route('imports.index')->with('success', 'Import encolado. Ejecuta php artisan queue:work para procesarlo.');
     }
