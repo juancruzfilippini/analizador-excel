@@ -18,15 +18,22 @@ class ProcessSchoolsImport implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * Ensure the database queue connection is used even if the default is misconfigured
-     * and allow more than 60s for large imports while still running in the worker.
+     * Allow more than 60s for large imports while still running in the worker.
      */
-    public $connection = 'database';
-    public $queue = 'imports';
     public $timeout = 300;
 
     public function __construct(private int $importId)
     {
+    }
+
+    public function viaConnection(): string
+    {
+        return 'database';
+    }
+
+    public function viaQueue(): string
+    {
+        return 'imports';
     }
 
     public function handle(): void
