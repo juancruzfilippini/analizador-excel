@@ -3,14 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ImportUploadRequest;
-use App\Imports\SchoolsDetailImport;
+use App\Jobs\ProcessSchoolsImport;
 use App\Models\Import;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use Maatwebsite\Excel\Facades\Excel;
-use Throwable;
 
 class ImportController extends Controller
 {
@@ -34,33 +30,11 @@ class ImportController extends Controller
         $import = Import::create([
             'original_name' => $file->getClientOriginalName(),
             'stored_path' => $storedPath,
-            'status' => 'processing',
+            'status' => 'queued',
         ]);
 
-        $importer = new SchoolsDetailImport($import->id);
+        ProcessSchoolsImport::dispatch($import->id);
 
-        try {
-            Excel::import($importer, $storedPath);
-            $summary = $importer->getSummary();
-
-            $import->update([
-                'rows_total' => $summary['rows_total'],
-                'rows_ok' => $summary['rows_ok'],
-                'rows_failed' => $summary['rows_failed'],
-                'status' => 'done',
-                'notes' => implode('\n', array_slice($summary['errors'], 0, 20)),
-            ]);
-
-            return redirect()->route('imports.index')->with('success', 'Importación completada.');
-        } catch (Throwable $e) {
-            Log::error('Error procesando import', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            $import->update([
-                'status' => 'failed',
-                'notes' => $e->getMessage(),
-            ]);
-            Storage::delete($storedPath);
-
-            return back()->withErrors('Ocurrió un error durante la importación. Ver logs.');
-        }
+        return redirect()->route('imports.index')->with('success', 'Import encolado. Ejecuta php artisan queue:work para procesarlo.');
     }
 }

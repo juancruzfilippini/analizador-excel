@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
@@ -30,7 +31,7 @@ class SchoolsDetailImport implements WithMultipleSheets
     public function sheets(): array
     {
         return [
-            'Detalle' => new class($this) implements ToCollection, WithHeadingRow, WithChunkReading {
+            'Detalle' => new class($this) implements ToCollection, WithHeadingRow, WithChunkReading, WithBatchInserts {
                 public function __construct(private SchoolsDetailImport $parent)
                 {
                 }
@@ -44,7 +45,12 @@ class SchoolsDetailImport implements WithMultipleSheets
 
                 public function chunkSize(): int
                 {
-                    return 200;
+                    return 500;
+                }
+
+                public function batchSize(): int
+                {
+                    return 500;
                 }
             },
         ];
