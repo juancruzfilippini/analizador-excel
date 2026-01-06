@@ -14,7 +14,7 @@ class ImportUploadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => ['required', 'file', 'mimes:xlsx,xls', 'max:10240'],
+            'file' => ['required', 'file', 'mimes:xlsx,xls', 'max:15360'],
         ];
     }
 
@@ -23,7 +23,7 @@ class ImportUploadRequest extends FormRequest
         return [
             'file.required' => 'Seleccioná un archivo para importar.',
             'file.mimes' => 'El archivo debe ser un Excel (.xlsx o .xls).',
-            'file.max' => 'El archivo es demasiado grande (10MB máximo).',
+            'file.max' => 'El archivo es demasiado grande (15MB máximo).',
         ];
     }
 }
