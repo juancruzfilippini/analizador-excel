@@ -21,9 +21,9 @@ class ProcessSchoolsImport implements ShouldQueue
      * Ensure the database queue connection is used even if the default is misconfigured
      * and allow more than 60s for large imports while still running in the worker.
      */
-    public string $connection = 'database';
-    public string $queue = 'imports';
-    public int $timeout = 300;
+    public $connection = 'database';
+    public $queue = 'imports';
+    public $timeout = 300;
 
     public function __construct(private int $importId)
     {
