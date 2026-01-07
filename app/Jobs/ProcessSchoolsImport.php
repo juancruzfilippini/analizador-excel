@@ -26,16 +26,6 @@ class ProcessSchoolsImport implements ShouldQueue
     {
     }
 
-    public function viaConnection(): string
-    {
-        return 'database';
-    }
-
-    public function viaQueue(): string
-    {
-        return 'imports';
-    }
-
     public function handle(): void
     {
         $import = Import::find($this->importId);
